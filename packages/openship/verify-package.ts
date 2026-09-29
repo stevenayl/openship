@@ -66,13 +66,41 @@ console.log('CJS_OK');
   if (!run(node, ["probe.cjs"]).includes("CJS_OK")) throw new Error("CommonJS package probe failed");
   writeFileSync(join(scratch, "native-probe.mjs"), `
 import assert from 'node:assert/strict';
+import { once } from 'node:events';
 import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
+import { createServer } from 'node:http';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createRequire } from 'node:module';
 const { createShip } = process.argv[2] === 'cjs' ? createRequire(import.meta.url)('openship/native') : await import('openship');
 const environment = { ...process.env };
 const directory = await mkdtemp(join(tmpdir(), 'openship-installed-native-'));
+let catalogRequests = 0;
+const catalog = createServer((request, response) => {
+  if (request.method !== 'GET' || request.url !== '/api/billing/plans?locale=ar') {
+    response.writeHead(404).end();
+    return;
+  }
+  catalogRequests++;
+  response.setHeader('content-type', 'application/json');
+  response.end(JSON.stringify({ data: {
+    provider: 'oblien', locale: 'ar', annual: { enabled: false, monthsFree: 2 }, ui: { free: 'Free' },
+    plans: [{
+      id: 'free', name: 'Free', description: '', popular: false,
+      price: { monthly: 0, annual: null }, effectivePrice: { monthly: 0 }, listPrice: { monthly: 0 }, campaign: null,
+      monthlyCredits: 0, annualCredits: null,
+      limits: {
+        workloads: ['static'], services: false, runningServices: 0, maxProjects: 0, maxResourceTier: 'low',
+        computeMinutesPerMonth: 0, buildMinutesPerMonth: 0, freeSubdomains: 10, customDomains: null, seats: null,
+      },
+      features: [], inheritedFrom: null, support: 'community', contactSales: null,
+    }],
+  } }));
+});
+catalog.listen(0, '127.0.0.1');
+await once(catalog, 'listening');
+const catalogAddress = catalog.address();
+assert.ok(catalogAddress && typeof catalogAddress !== 'string');
 let identity = null;
 let ship;
 const options = {
@@ -81,6 +109,7 @@ const options = {
   encryptionKey: 'installed-sdk-smoke-test-persistent-key-32-bytes',
   runtime: 'bare', routing: 'none', administration: true,
   policy: { allowHostExecution: true },
+  environment: { OPENSHIP_CLOUD_API_URL: 'http://127.0.0.1:' + catalogAddress.port },
   identity: { resolve: async assertion => assertion === 'verified-host-session' ? identity : null },
 };
 try {
@@ -92,6 +121,7 @@ try {
   const plans = await scoped.billing.listPlans({ locale: 'ar' });
   assert.equal(plans.locale, 'ar');
   assert.ok(plans.plans.length > 0);
+  assert.equal(catalogRequests, 1);
   const notice = await ship.operator.notices.create({ title: 'Installed SDK', message: 'Persistent operator notice' });
   assert.ok((await scoped.notices.list()).advisories.some(item => item.id === notice.id));
   assert.equal(scoped.notices.create, undefined);
@@ -140,6 +170,8 @@ try {
   console.log('NATIVE_OK');
 } finally {
   await ship?.close();
+  catalog.closeAllConnections();
+  await new Promise((resolve, reject) => catalog.close(error => error ? reject(error) : resolve()));
   await rm(directory, { recursive: true, force: true });
 }
 `);
