@@ -57,8 +57,8 @@ export function AuthShell({
               <UiIcon name="arrow-left" className="size-4 rtl:rotate-180" />
             </Button>
           )}
-          <Logo size={24} />
-          <span className="text-[16px] font-semibold tracking-tight text-foreground">
+          <Logo size={28} />
+          <span className="sr-only">
             {brand}
           </span>
         </div>
