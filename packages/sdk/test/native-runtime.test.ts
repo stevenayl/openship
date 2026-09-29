@@ -1,6 +1,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { execFile } from "node:child_process";
+import { once } from "node:events";
 import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -66,12 +68,40 @@ describe("owned native platform on Node", () => {
 
   it("persists operator notices while ordinary scopes only read public announcements", async () => {
     const directory = await mkdtemp(join(tmpdir(), "openship-native-notices-"));
+    let catalogRequests = 0;
+    const catalog = createServer((request, response) => {
+      if (request.method !== "GET" || request.url !== "/api/billing/plans?locale=ar") {
+        response.writeHead(404).end();
+        return;
+      }
+      catalogRequests++;
+      response.setHeader("content-type", "application/json");
+      response.end(JSON.stringify({ data: {
+        provider: "oblien", locale: "ar", annual: { enabled: false, monthsFree: 2 }, ui: { free: "Free" },
+        plans: [{
+          id: "free", name: "Free", description: "", popular: false,
+          price: { monthly: 0, annual: null }, effectivePrice: { monthly: 0 }, listPrice: { monthly: 0 }, campaign: null,
+          monthlyCredits: 0, annualCredits: null,
+          limits: {
+            workloads: ["static"], services: false, runningServices: 0, maxProjects: 0, maxResourceTier: "low",
+            computeMinutesPerMonth: 0, buildMinutesPerMonth: 0, freeSubdomains: 10, customDomains: null, seats: null,
+          },
+          features: [], inheritedFrom: null, support: "community", contactSales: null,
+        }],
+      } }));
+    });
+    catalog.listen(0, "127.0.0.1");
+    await once(catalog, "listening");
+    const catalogAddress = catalog.address();
+    expect(catalogAddress && typeof catalogAddress !== "string").toBe(true);
+    if (!catalogAddress || typeof catalogAddress === "string") throw new Error("Billing catalogue test server did not bind to TCP");
     let identity: VerifiedIdentity | null = null;
     let ship: OwnedShip<string> | undefined;
     const options = {
       instanceId: "notices", stateDirectory: directory,
       storage: { driver: "pglite" as const, dataDir: join(directory, "database") },
       encryptionKey: key, runtime: "bare" as const, routing: "none" as const,
+      environment: { OPENSHIP_CLOUD_API_URL: `http://127.0.0.1:${catalogAddress.port}` },
       administration: true, identity: { resolve: async () => identity },
     };
     try {
@@ -85,6 +115,7 @@ describe("owned native platform on Node", () => {
       expect(Object.keys(scope.notices)).toEqual(["list"]);
       expect((await scope.notices.list()).advisories.map(row => row.id)).toEqual([notice.id]);
       expect((await scope.billing.listPlans({ locale: "ar" })).locale).toBe("ar");
+      expect(catalogRequests).toBe(1);
       await expect(scope.billing.getState()).rejects.toMatchObject({ code: "CLOUD_SCOPE_UNAVAILABLE" });
       await ship.close();
       ship = await createShip(options);
@@ -99,6 +130,8 @@ describe("owned native platform on Node", () => {
       expect(await scope.notices.list()).toEqual({ advisories: [] });
     } finally {
       await ship?.close();
+      catalog.closeAllConnections();
+      await new Promise<void>((resolve, reject) => catalog.close(error => error ? reject(error) : resolve()));
       await rm(directory, { recursive: true, force: true });
     }
   }, 60_000);
