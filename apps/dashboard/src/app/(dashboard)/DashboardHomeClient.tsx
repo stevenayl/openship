@@ -2,14 +2,12 @@
 
 import { Icon as UiIcon } from "@repo/ui/icons";
 
-import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { projectsApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import UpdatesBlock from "@/components/overview/UpdatesBlock";
 import SystemStatusRow from "@/components/overview/SystemStatusRow";
 import HomeWelcome from "@/components/overview/HomeWelcome";
+import HomeGreeting from "@/components/overview/HomeGreeting";
 import { useI18n, interpolate } from "@/components/i18n-provider";
 import type { Dictionary } from "@/i18n";
 import { PageContainer } from "@/components/ui/PageContainer";
@@ -45,25 +43,18 @@ import { useAttentionFeed } from "@/hooks/useAttentionFeed";
 
 interface DashboardHomeClientProps {
   initialData?: any;
+  /** Server-rendered hour, carried through hydration before local time takes over. */
+  initialHour: number;
 }
 
-export default function DashboardHomeClient({ initialData }: DashboardHomeClientProps) {
+export default function DashboardHomeClient({ initialData, initialHour }: DashboardHomeClientProps) {
   const { user } = useAuth();
   const { t } = useI18n();
-  const router = useRouter();
   
   const { projects, numbers, loading, removeProject } = useDashboardHome(initialData);
   /** Read once here, not inside the card: the count decides the column's layout below. */
   const attention = useAttentionFeed();
 
-  /* ---------- greeting ---------- */
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12
-      ? t.dashboard.home.goodMorning
-      : hour < 18
-        ? t.dashboard.home.goodAfternoon
-        : t.dashboard.home.goodEvening;
   const displayName = user?.name?.split(" ")[0] || "";
 
 
@@ -72,9 +63,7 @@ export default function DashboardHomeClient({ initialData }: DashboardHomeClient
         
         {/* ── Header ─────────────────────────────────────────────── */}
         <div className="mb-6">
-          <h1 className="text-2xl font-medium text-foreground/80" style={{ letterSpacing: "-0.2px" }}>
-            {displayName ? interpolate(t.dashboard.home.greetingName, { greeting, name: displayName }) : greeting}
-          </h1>
+          <HomeGreeting displayName={displayName} initialHour={initialHour} />
           <p className="text-sm text-muted-foreground/70 mt-1">
             {t.dashboard.home.subtitle}
           </p>

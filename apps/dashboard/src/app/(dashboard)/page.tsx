@@ -38,5 +38,5 @@ export default async function DashboardHome() {
     console.error("Failed to fetch initial dashboard data", error);
   }
 
-  return <DashboardHomeClient initialData={initialData} />;
+  return <DashboardHomeClient initialData={initialData} initialHour={new Date().getHours()} />;
 }
