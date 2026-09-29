@@ -35,7 +35,7 @@ function UsageBar({ pct }: { pct: number }) {
   return (
     <div className="h-1.5 bg-muted rounded-full overflow-hidden mt-3">
       <div
-        className={`h-full rounded-full transition-all duration-700 ease-out ${tone}`}
+        className={`h-full rounded-full transition-[width] duration-700 ease-out motion-reduce:transition-none ${tone}`}
         style={{ width: `${Math.min(pct, 100)}%` }}
       />
     </div>
@@ -56,20 +56,20 @@ function StatCard({
   pct?: number;
 }) {
   return (
-    <div className="bg-card rounded-2xl border border-border/50 p-5">
-      <div className="flex items-center gap-2 mb-3">
+    <div className="min-w-0 rounded-lg border border-border bg-card p-6">
+      <div className="flex min-w-0 items-center gap-2 mb-4">
         <UiIcon name={Icon}
-          className="size-4 text-muted-foreground"
+          className="size-4 shrink-0 text-muted-foreground"
         />
-        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        <span className="min-w-0 text-xs font-medium text-muted-foreground break-words">
           {label}
         </span>
       </div>
-      <p className="text-2xl font-semibold text-foreground tracking-tight tabular-nums">
+      <p className="min-h-9 font-mono text-[28px] leading-9 font-semibold text-foreground tracking-tight tabular-nums whitespace-nowrap">
         {value}
       </p>
       {sub && (
-        <p className="text-xs text-muted-foreground mt-1 tabular-nums">{sub}</p>
+        <p className="min-h-10 text-xs leading-5 text-muted-foreground mt-2 tabular-nums">{sub}</p>
       )}
       {pct != null && <UsageBar pct={pct} />}
     </div>
@@ -104,11 +104,11 @@ export function OverviewTab({
       : null;
 
   return (
-    <div className="space-y-6">
-      {/* Stat cards - neutral icons; the bar tone is the only thing that
-          changes with the data, so resting state is calm and high usage
-          stands out. */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="@container/metrics space-y-4">
+      {/* Follow the available column width, not the viewport: a wide screen can
+          still leave a narrow overview beside the connection card. Each card
+          keeps enough room for its label and an unbroken uptime value. */}
+      <div className="grid grid-cols-1 gap-4 @min-[28rem]/metrics:grid-cols-2 @min-[56rem]/metrics:grid-cols-4">
         <StatCard
           icon={"cpu"}
           label={t.servers.overview.cpu}
@@ -163,8 +163,8 @@ export function OverviewTab({
       {/* Components - inline-header card pattern matching the rest of
           the dashboard. No icon-in-emerald-circle; just a small muted
           icon next to the heading. */}
-      <div className="bg-card rounded-2xl border border-border/50 p-5">
-        <div className="flex items-center justify-between gap-3 mb-4">
+      <div className="min-w-0 rounded-lg border border-border bg-card p-6">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 mb-4">
           <div className="flex items-center gap-2 min-w-0">
             <UiIcon name="activity"
               className="size-4 text-muted-foreground shrink-0"
@@ -192,11 +192,11 @@ export function OverviewTab({
             <UiIcon name="spinner" className="size-4 animate-spin text-muted-foreground" />
           </div>
         ) : totalCount > 0 ? (
-          <div className="divide-y divide-border/40 -mx-5">
+          <div className="divide-y divide-border -mx-6">
             {components.map((comp) => (
               <div
                 key={comp.name}
-                className="flex items-center gap-3 px-5 py-3"
+                className="grid grid-cols-[1rem_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 px-6 py-3"
               >
                 {comp.healthy ? (
                   <UiIcon name="check-circle"
@@ -207,16 +207,16 @@ export function OverviewTab({
                     className="size-4 text-danger shrink-0"
                   />
                 )}
-                <span className="text-sm text-foreground flex-1 truncate">
+                <span className="min-w-0 text-sm text-foreground break-words">
                   {comp.label || comp.name}
                 </span>
                 {comp.version && (
-                  <span className="text-[11px] font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">
+                  <span className="col-start-2 row-start-2 min-w-0 w-fit max-w-full break-all text-[11px] font-mono text-muted-foreground bg-muted/60 px-2 py-1 rounded">
                     v{comp.version}
                   </span>
                 )}
                 <span
-                  className={`text-xs font-medium ${
+                  className={`col-start-3 row-start-1 text-xs font-medium ${
                     comp.healthy
                       ? "text-success"
                       : "text-danger"
