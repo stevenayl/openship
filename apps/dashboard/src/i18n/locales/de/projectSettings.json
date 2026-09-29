@@ -4,6 +4,10 @@
     "save": "Speichern",
     "cancel": "Abbrechen"
   },
+  "appSource": {
+    "automaticUpdateUnavailable": "Automatisches Update nicht verfügbar",
+    "automaticUpdateUnavailableDescription": "Ein Update wurde erkannt, aber mindestens ein Service-Image ist lokal oder kann nicht aus seiner Registry aufgelöst werden. Veröffentlichen Sie alle Service-Images, bevor Sie das Projekt-Update anwenden."
+  },
   "releaseImageSource": {
     "validationInvalid": "Die Release-Image-Quelle ist ungültig.",
     "toast": {

@@ -4,6 +4,10 @@
     "save": "保存",
     "cancel": "取消"
   },
+  "appSource": {
+    "automaticUpdateUnavailable": "自动更新不可用",
+    "automaticUpdateUnavailableDescription": "检测到更新，但至少有一个服务镜像是本地镜像，或无法从其注册表解析。在应用项目更新之前，请先发布所有服务镜像。"
+  },
   "releaseImageSource": {
     "validationInvalid": "发行镜像来源无效。",
     "toast": {

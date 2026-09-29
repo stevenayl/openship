@@ -4,6 +4,10 @@
     "save": "保存",
     "cancel": "キャンセル"
   },
+  "appSource": {
+    "automaticUpdateUnavailable": "自動更新を利用できません",
+    "automaticUpdateUnavailableDescription": "更新が検出されましたが、少なくとも1つのサービスイメージがローカルにあるか、レジストリから解決できません。プロジェクトの更新を適用する前に、すべてのサービスイメージを公開してください。"
+  },
   "releaseImageSource": {
     "validationInvalid": "リリースイメージのソースが無効です。",
     "toast": {

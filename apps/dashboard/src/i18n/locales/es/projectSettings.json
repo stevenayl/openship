@@ -4,6 +4,10 @@
     "save": "Guardar",
     "cancel": "Cancelar"
   },
+  "appSource": {
+    "automaticUpdateUnavailable": "Actualización automática no disponible",
+    "automaticUpdateUnavailableDescription": "Se detectó una actualización, pero al menos una imagen de servicio es local o no se puede resolver desde su registro. Publique todas las imágenes de servicio antes de aplicar la actualización del proyecto."
+  },
   "releaseImageSource": {
     "validationInvalid": "La fuente de la imagen de versión no es válida.",
     "toast": {

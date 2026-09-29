@@ -4,6 +4,10 @@
     "save": "Enregistrer",
     "cancel": "Annuler"
   },
+  "appSource": {
+    "automaticUpdateUnavailable": "Mise à jour automatique indisponible",
+    "automaticUpdateUnavailableDescription": "Une mise à jour a été détectée, mais au moins une image de service est locale ou ne peut pas être résolue depuis son registre. Publiez toutes les images de service avant d’appliquer la mise à jour du projet."
+  },
   "releaseImageSource": {
     "validationInvalid": "La source de l'image de version est incorrecte.",
     "toast": {

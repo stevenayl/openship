@@ -4,6 +4,10 @@
     "save": "حفظ",
     "cancel": "إلغاء"
   },
+  "appSource": {
+    "automaticUpdateUnavailable": "التحديث التلقائي غير متاح",
+    "automaticUpdateUnavailableDescription": "تم اكتشاف تحديث، لكن صورة خدمة واحدة على الأقل محلية أو لا يمكن العثور عليها في سجل الحاويات. انشر جميع صور الخدمات قبل تطبيق تحديث المشروع."
+  },
   "releaseImageSource": {
     "validationInvalid": "مصدر صورة الإصدار غير صالح.",
     "toast": {

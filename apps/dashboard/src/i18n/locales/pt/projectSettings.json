@@ -4,6 +4,10 @@
     "save": "Guardar",
     "cancel": "Cancelar"
   },
+  "appSource": {
+    "automaticUpdateUnavailable": "Atualização automática indisponível",
+    "automaticUpdateUnavailableDescription": "Foi detetada uma atualização, mas pelo menos uma imagem de serviço é local ou não pode ser resolvida a partir do respetivo registo. Publique todas as imagens de serviço antes de aplicar a atualização do projeto."
+  },
   "releaseImageSource": {
     "validationInvalid": "A origem da imagem de lançamento é inválida.",
     "toast": {
