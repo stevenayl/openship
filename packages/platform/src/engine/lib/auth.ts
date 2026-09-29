@@ -5,7 +5,13 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { bearer, mcp, emailOTP } from "better-auth/plugins";
 import { organization } from "better-auth/plugins/organization";
 import { db, getDriver, repos, schema, and, eq, gt } from "@repo/db";
-import { env, runtimeTarget, runtimeTargetId, trustedOrigins } from "../config/env";
+import {
+  env,
+  runtimeTarget,
+  runtimeTargetId,
+  trustedOrigins,
+  localDashboardUrl,
+} from "../config/env";
 import {
   resolveAuthBaseUrl,
   resolveDashboardPublicUrl,
@@ -20,6 +26,8 @@ import { provisionUser } from "./provision-user";
 import { socialProviderCredentials } from "./auth-providers";
 import { isAuthorizedLocalSignup } from "./local-bootstrap";
 import { secureCookiePreference } from "./auth-cookie-policy";
+import { accountSecurityPlugins } from "./account-security";
+import { getAuthMode } from "./auth-mode";
 
 /**
  * Better Auth - handles registration, login, OAuth, sessions, tokens.
@@ -114,6 +122,8 @@ export const auth = betterAuth({
       oauthApplication: schema.oauthApplication,
       oauthAccessToken: schema.oauthAccessToken,
       oauthConsent: schema.oauthConsent,
+      passkey: schema.passkey,
+      twoFactor: schema.twoFactor,
     },
   }),
 
@@ -349,6 +359,12 @@ export const auth = betterAuth({
 
   /* ---------- Plugins ---------- */
   plugins: [
+    ...accountSecurityPlugins({
+      // DB-discovered self-app domains construct URLs; they do not grant trust.
+      dashboardUrl: env.OPENSHIP_PUBLIC_URL || localDashboardUrl,
+      getAuthMode,
+    }),
+
     /**
      * Bearer auth — accepts `Authorization: Bearer <session.token>` as
      * an alternative to the session cookie. Needed for server-to-server

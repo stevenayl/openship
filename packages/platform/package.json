@@ -30,7 +30,8 @@
     "build:native": "bun run build-native.ts"
   },
   "dependencies": {
-    "@better-auth/drizzle-adapter": "^1.5.4",
+    "@better-auth/drizzle-adapter": "1.5.4",
+    "@better-auth/passkey": "1.5.4",
     "@octokit/auth-oauth-device": "^8.0.3",
     "@octokit/request": "^10.0.8",
     "@repo/adapters": "workspace:*",
@@ -38,7 +39,7 @@
     "@repo/core": "workspace:*",
     "@repo/db": "workspace:*",
     "@sinclair/typebox": "^0.34.48",
-    "better-auth": "^1.5.4",
+    "better-auth": "1.5.4",
     "bullmq": "^5.70.4",
     "cron-parser": "^4.9.0",
     "dockerode": "^4.0.9",
