@@ -183,6 +183,56 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # A fork publishes the candidate image in its own GHCR namespace, but the
+      # predecessor is an official OpenShip release. Mirror that exact manifest into
+      # the fork so the update test still exercises the same registry path operators
+      # use. Refuse to replace an existing tag with different bytes.
+      - name: Mirror the verified previous API release into this registry
+        if: github.repository_owner != 'oblien'
+        env:
+          SOURCE_REGISTRY: ghcr.io/oblien
+          TARGET_REGISTRY: ghcr.io/${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+
+          tags_at_head="$(git tag --points-at HEAD)"
+          old_version=""
+          while IFS= read -r tag; do
+            [ -n "$tag" ] || continue
+            case "$tag" in *-*) continue ;; esac
+            if grep -Fqx "$tag" <<<"$tags_at_head"; then
+              continue
+            fi
+            old_version="${tag#v}"
+            break
+          done < <(git tag --list 'v*.*.*' --sort=-v:refname)
+
+          if [ -z "$old_version" ]; then
+            echo "No stable previous release tag is available to mirror." >&2
+            exit 1
+          fi
+
+          source_ref="$SOURCE_REGISTRY/openship-api:$old_version"
+          source_digest="$(docker buildx imagetools inspect "$source_ref" --format '{{.Manifest.Digest}}')"
+          target_ref="$TARGET_REGISTRY/openship-api:$old_version"
+          target_digest="$(docker buildx imagetools inspect "$target_ref" --format '{{.Manifest.Digest}}' 2>/dev/null || true)"
+
+          if [ -n "$target_digest" ] && [ "$target_digest" != "$source_digest" ]; then
+            echo "$target_ref already exists with a different digest; refusing to replace it." >&2
+            exit 1
+          fi
+
+          if [ -z "$target_digest" ]; then
+            docker buildx imagetools create --tag "$target_ref" "$source_ref@$source_digest"
+          fi
+
+          mirrored_digest="$(docker buildx imagetools inspect "$target_ref" --format '{{.Manifest.Digest}}')"
+          if [ "$mirrored_digest" != "$source_digest" ]; then
+            echo "Mirrored predecessor digest does not match the official release." >&2
+            exit 1
+          fi
+          echo "Verified $target_ref at $mirrored_digest"
+
       # This runner is amd64, so it needs the amd64 half of the build. The artifact holds
       # one empty file NAMED for the digest (see "Export digest" above).
       - name: Resolve the new api image digest
