@@ -1093,6 +1093,13 @@
       "when": 1790670000001,
       "tag": "0155_passkeys",
       "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1790756400000,
+      "tag": "0156_server_management_mode",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { audit, operationAuditContext } from "../../lib/audit-emitter";
 import { repos } from "@repo/db";
 import { randomBytes } from "node:crypto";
 import { encrypt } from "@repo/platform/engine/lib/encryption";
+import { requireManagedOrgServer } from "@repo/platform/engine/lib/server-target";
 import {
   getBuildMode,
   getDeployDefaults,
@@ -208,6 +209,7 @@ export async function updateDeployDefaults(ctx: ExecutionContext, body: Static<t
       throw new ValidationError("defaultServerId is required when defaultDeployTarget='server'");
     }
     serverId = rawServerId;
+    await requireManagedOrgServer(serverId, ctx.organizationId);
   }
 
   const existing = await repos.settings.findByUser(ctx.userId);

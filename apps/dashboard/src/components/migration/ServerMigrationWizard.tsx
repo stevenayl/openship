@@ -535,7 +535,7 @@ export function ServerMigrationWizard({
     setSelectedId(s?.id ?? null);
     setServerName(s?.name ?? null);
     reset();
-    setTargetId(s?.id ?? null);
+    setTargetId(s?.managementMode === "observe_only" ? null : (s?.id ?? null));
   };
 
   const handleScan = async (flatOverride?: boolean) => {
@@ -1737,6 +1737,7 @@ export function ServerMigrationWizard({
                 </div>
                 <div className="w-56 min-w-0">
                   <ServerSelector
+                    managedOnly
                     value={targetId}
                     onSelect={(s) => setTargetId(s?.id ?? null)}
                     compact
@@ -2248,7 +2249,7 @@ export function ServerMigrationWizard({
             <UiIcon name="arrow-right" className="size-4 text-muted-foreground" />
             <span className="text-sm font-medium text-foreground">{m.wizard.targetLabel}</span>
           </div>
-          <ServerSelector value={targetId} onSelect={(s) => setTargetId(s?.id ?? null)} compact />
+          <ServerSelector managedOnly value={targetId} onSelect={(s) => setTargetId(s?.id ?? null)} compact />
           <label className="flex items-center gap-2 text-xs text-foreground cursor-pointer">
             <input
               type="checkbox"
@@ -2697,6 +2698,7 @@ export function ServerMigrationWizard({
                       {/* dropUp: this card is `overflow-hidden` and the picker sits at its
                           bottom, so a down-opening menu is hard-clipped. */}
                       <ServerSelector
+                        managedOnly
                         value={targetId}
                         onSelect={(s) => setTargetId(s?.id ?? null)}
                         compact
