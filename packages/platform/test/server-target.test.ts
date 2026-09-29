@@ -12,6 +12,15 @@ vi.mock("@repo/db", () => ({
   },
 }));
 
+vi.mock("../src/engine/config/env", () => ({
+  env: {
+    SERVER_IP: null,
+    OPENSHIP_PUBLIC_URL: null,
+    CLOUD_MODE: false,
+    DEPLOY_MODE: "desktop",
+  },
+}));
+
 import { requireManagedOrgServer, requireOrgServer } from "../src/engine/lib/server-target";
 
 beforeEach(() => {
