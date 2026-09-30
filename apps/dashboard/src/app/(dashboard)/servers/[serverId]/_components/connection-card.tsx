@@ -31,7 +31,7 @@ export function ServerConnectionCard({ server }: { server: ConnectionServer }) {
     try { accessUrl = cloudflareSshUrl(server.sshHost); } catch { /* invalid legacy data has no external action */ }
   }
   return (
-    <div className="bg-card rounded-2xl border border-border/50 p-5">
+    <div className="min-w-0 flex-1 rounded-lg border border-border bg-card p-6">
       <div className="flex items-center gap-2 mb-4">
         <UiIcon name="server" className="size-4 text-muted-foreground" />
         <h3 className="font-semibold text-foreground text-sm">{d.connection}</h3>
@@ -40,7 +40,7 @@ export function ServerConnectionCard({ server }: { server: ConnectionServer }) {
         <Row icon={<UiIcon name="globe" className="size-4 text-muted-foreground" />} label={d.host}>
           {/* Flag sits WITH the host it describes, rather than in the page header
               next to the title. */}
-          <span className="flex items-center gap-2 ms-3 min-w-0">
+          <span className="flex items-center justify-end gap-2 min-w-0">
             {(() => {
               const Flag = server.country ? FLAGS[server.country] : undefined;
               return Flag ? (
@@ -50,29 +50,29 @@ export function ServerConnectionCard({ server }: { server: ConnectionServer }) {
                 />
               ) : null;
             })()}
-            <span className="text-sm font-medium text-foreground font-mono truncate max-w-[140px]">
+            <span className="min-w-0 text-sm font-medium text-foreground font-mono break-all tabular-nums">
               <BlurIp>{server.sshHost}</BlurIp>
             </span>
           </span>
         </Row>
         {!isCloudflare && <Row icon={<UiIcon name="network" className="size-4 text-muted-foreground" />} label={d.port}>
-          <span className="text-sm font-medium text-foreground font-mono">{server.sshPort ?? 22}</span>
+          <span className="min-w-0 break-all text-sm font-medium text-foreground font-mono tabular-nums">{server.sshPort ?? 22}</span>
         </Row>}
         <Row icon={<UiIcon name="user" className="size-4 text-muted-foreground" />} label={d.user}>
-          <span className="text-sm font-medium text-foreground font-mono">{server.sshUser ?? "root"}</span>
+          <span className="min-w-0 break-all text-sm font-medium text-foreground font-mono tabular-nums">{server.sshUser ?? "root"}</span>
         </Row>
 
         <div className="h-px bg-border/60 my-2" />
 
         <Row icon={<UiIcon name="key" className="size-4 text-muted-foreground" />} label={d.auth}>
-          <span className="text-sm font-medium text-foreground">
+          <span className="min-w-0 break-words text-sm font-medium text-foreground">
             {server.sshAuthMethod === "agent" ? t.servers.form.agent : server.sshAuthMethod === "key" ? d.authSshKey : d.authPassword}
           </span>
         </Row>
         {isCloudflare && <Row icon={<UiIcon name="cloud" className="size-4 text-warning" />} label={t.servers.sshTransport.label}>
-          <span className="text-sm font-medium text-foreground">Cloudflare Access</span>
+          <span className="min-w-0 break-words text-sm font-medium text-foreground">Cloudflare Access</span>
         </Row>}
-        {accessUrl && <a href={accessUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        {accessUrl && <a href={accessUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground">
           {t.servers.sshTransport.openAccess}
           <UiIcon name="external-link" className="size-3.5" />
         </a>}
@@ -83,10 +83,10 @@ export function ServerConnectionCard({ server }: { server: ConnectionServer }) {
 
 function Row({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-muted/60 flex items-center justify-center">{icon}</div>
-        <span className="text-sm text-muted-foreground">{label}</span>
+    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] items-center gap-4 [&>:last-child]:text-end">
+      <div className="flex min-w-0 items-center gap-2">
+        <div className="w-8 h-8 shrink-0 rounded-lg bg-muted/60 flex items-center justify-center">{icon}</div>
+        <span className="min-w-0 break-words text-sm text-muted-foreground">{label}</span>
       </div>
       {children}
     </div>

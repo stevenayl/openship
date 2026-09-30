@@ -608,21 +608,22 @@ export default function ServerDetailPage({
 
   return (
     <PageContainer>
+      <div className="@container/server min-w-0">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
           {/* `app-nav-fallback` hides this in the desktop app, where the titlebar
               already carries back/forward. It stays on web/SaaS, which has no
               titlebar and would otherwise leave no way out of this page. */}
           <button
             onClick={() => router.push("/servers")}
-            className="app-nav-fallback w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
+            className="app-nav-fallback w-8 h-8 shrink-0 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
             aria-label={t.servers.setup.goToServers}
           >
             <UiIcon name="arrow-left" className="size-4 text-muted-foreground rtl:rotate-180" />
           </button>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 basis-48">
             <h1
-              className="text-2xl font-medium text-foreground/80 truncate"
+              className="text-lg font-semibold text-foreground break-words"
               style={{ letterSpacing: "-0.2px" }}
             >
               {server.name || <BlurIp>{server.sshHost}</BlurIp>}
@@ -635,8 +636,8 @@ export default function ServerDetailPage({
             {/* Connection line: user@host + a clean status pill (no loud dot).
                 The country flag lives on the connection card's Host row — beside
                 the value it describes — and the SSH port lives there too. */}
-            <div className="mt-1 flex items-center gap-2">
-              <p className="text-sm text-muted-foreground/70 font-mono">
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <p className="min-w-0 break-all text-xs text-muted-foreground font-mono">
                 {server.sshUser ?? "root"}@<BlurIp>{server.sshHost}</BlurIp>
               </p>
               {allHealthy ? (
@@ -650,10 +651,10 @@ export default function ServerDetailPage({
               ) : null}
             </div>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="ms-auto flex shrink-0 items-center gap-2">
             <button
               onClick={() => router.push(`/servers/${serverId}?edit=true`)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 text-foreground text-sm font-medium rounded-xl hover:bg-muted transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-border bg-card text-foreground text-sm font-medium rounded-md hover:bg-muted transition-colors"
             >
               <UiIcon name="sliders" className="size-4" />
               {t.servers.detail.edit}
@@ -671,7 +672,7 @@ export default function ServerDetailPage({
                     className="fixed inset-0 z-40"
                     onClick={() => setShowMenu(false)}
                   />
-                  <div className="absolute end-0 top-full mt-1 z-50 w-48 bg-popover border border-border rounded-xl shadow-lg py-1">
+                  <div className="absolute end-0 top-full mt-1 z-50 w-48 bg-popover border border-border rounded-lg shadow-lg py-1">
                     <button
                       onClick={() => {
                         setShowMenu(false);
@@ -690,7 +691,7 @@ export default function ServerDetailPage({
         </div>
 
         {server.managementMode === "observe_only" && (
-          <div className="mb-6 rounded-xl border border-border/50 bg-muted/20 px-4 py-3 text-sm text-muted-foreground">
+          <div className="mb-6 rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
             {t.servers.detail.observeOnlyNotice}
           </div>
         )}
@@ -716,7 +717,7 @@ export default function ServerDetailPage({
             a hand-rolled copy of it). `href` keeps the tabs deep-linkable and
             cmd-clickable; a plain click still switches client-side. */}
         <Tabs
-          className="mb-6"
+          className="mb-6 w-full max-w-full"
           value={displayTab}
           onChange={(key) => changeTab(key)}
           tabs={TABS.filter(
@@ -733,9 +734,9 @@ export default function ServerDetailPage({
           }))}
         />
 
-        {/* Main Grid — the Migrations tab spans full width (its flow renders its
-            own right column: connection card → migrate config / live progress). */}
-        <div className={`grid grid-cols-1 gap-6 items-start ${displayTab === "migrations" ? "" : "lg:grid-cols-[1fr_340px]"}`}>
+        {/* Only add the connection column when this panel has room for it.
+            Migrations spans full width and owns its own connection column. */}
+        <div className={`grid min-w-0 grid-cols-1 gap-4 items-stretch ${displayTab === "migrations" ? "" : "@min-[64rem]/server:grid-cols-[minmax(0,1fr)_20rem]"}`}>
           {/* Left column */}
           <div className="min-w-0">
 
@@ -825,13 +826,14 @@ export default function ServerDetailPage({
           {/* Right sidebar — connection summary. Hidden on the Migrations tab,
               whose flow renders its own right column. */}
           {displayTab !== "migrations" && (
-            <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
+            <div className="min-w-0 flex flex-col gap-4">
               <ServerConnectionCard server={server} />
               <ServerInfrastructure serverId={serverId} />
             </div>
           )}
         </div>
 
+      </div>
         <ServerDeletionModal
           isOpen={removeOpen}
           onClose={() => setRemoveOpen(false)}

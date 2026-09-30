@@ -281,7 +281,7 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
   const sectionLabel = (key: string) =>
     (t.dashboard.nav.sections as unknown as Record<string, string>)[key] ?? key;
 
-  // The gradient CTA. Mail view swaps New Project for Add mailbox, but only once
+  // The primary action. Mail view swaps New Project for Add mailbox, but only once
   // there's an installed server to add one to — before that the rail's own "Set
   // up mail" entry IS the primary action, and a second button just repeats it.
   const cta: { href: string; labelKey: string } | null = mailView
@@ -293,18 +293,18 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
   return (
     <aside
       id="dashboard-sidebar"
-      className={`my-3 ms-3 flex shrink-0 flex-col rounded-2xl border border-border/50 bg-card transition-[width] duration-200 overflow-hidden ${
-        collapsed ? "w-[72px]" : "w-[260px]"
+      className={`flex h-full min-h-0 shrink-0 flex-col border-e border-border bg-card transition-[width] duration-200 ${
+        collapsed ? "w-[72px]" : "w-[240px] max-w-[calc(100vw-48px)]"
       }`}
     >
       {/* ── Header ───────────────────────────────────────────── */}
       <div
-        className={`app-sidebar-header flex items-center px-5 py-6 ${collapsed ? "flex-col gap-3 pb-3" : "justify-between"}`}
+        className={`app-sidebar-header flex shrink-0 items-center px-4 py-6 ${collapsed ? "flex-col gap-3 pb-3" : "justify-between"}`}
       >
         <div className="flex items-center gap-2.5 min-w-0">
-          <Logo size={26} className="shrink-0" />
+          <Logo size={28} compact={collapsed} />
           {!collapsed && (
-            <span className="text-base font-semibold tracking-tight text-foreground truncate">
+            <span className="sr-only">
               {brand}
             </span>
           )}
@@ -343,11 +343,11 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
 
       {/* ── Nav sections ────────────────────────────────────────── */}
       <div className="relative flex-1 min-h-0">
-        <nav className="h-full overflow-y-auto px-3 pt-3 pb-12">
+        <nav className="h-full overflow-y-auto overscroll-contain px-3 py-4">
           {navSections.map(({ section, items }, si) => (
             <div key={section ?? si} className={si > 0 ? "mt-5" : undefined}>
               {!collapsed && section && (
-                <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
                   {sectionLabel(section)}
                 </p>
               )}
@@ -371,7 +371,7 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
                       title={collapsed ? (issueLabel ?? label(key, labelSource)) : undefined}
                       aria-label={issueLabel}
                       aria-current={active ? "page" : undefined}
-                      className={`th-nav-item flex items-center rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors ${
+                      className={`th-nav-item flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                         collapsed ? "justify-center" : "gap-3"
                       }`}
                     >
@@ -382,7 +382,7 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
                       {/* Hide zero/loading counts; keep issue counts in the collapsed label. */}
                       {!collapsed && count != null && count > 0 && (
                         <span
-                          className={`shrink-0 text-[13px] tabular-nums ${key === "issues" ? (issueCounts?.outage ? "text-danger" : "text-warning") : "text-muted-foreground/45"}`}
+                          className={`shrink-0 text-[13px] tabular-nums ${key === "issues" ? (issueCounts?.outage ? "text-danger" : "text-warning") : "text-muted-foreground"}`}
                         >
                           {count}
                         </span>
@@ -394,28 +394,16 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
             </div>
           ))}
         </nav>
-        {/* Fade the bottom of the scroll into the sidebar bg so the list ends
-            smoothly behind the CTA instead of cutting off hard. */}
-        {/* Fade masks nav overflow scrolling under the button. --card is a
-            white-based translucent token, so the default fades toward
-            transparent-WHITE — fine on light, but a light sheen on the mid-gray
-            dim card and invisible on the near-black dark card. Use the solid
-            card hue in dim AND dark so the ramp stays the card's own color. */}
-        {/* Scroll fade. ONE gradient for every theme: --th-card-on-page is the
-            opaque composite of this card over the page, so the fade starts at
-            exactly the surface behind it. The per-theme variants this replaces
-            faded from --th-card-bg-solid (the MODAL surface) — #060606 in dark
-            against a real sidebar of #0d0d0d, i.e. a black band. */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[var(--th-card-on-page)] to-transparent" />
+
       </div>
 
       {/* ── Primary action ──────────────────────────────────── */}
       {cta && (
-        <div className="px-3 pb-2">
+        <div className="shrink-0 px-3 pb-4">
           <Link
             href={cta.href}
             title={collapsed ? label(cta.labelKey) : undefined}
-            className="th-btn-accent flex items-center justify-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all overflow-hidden hover:brightness-110"
+            className="th-btn flex items-center justify-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all overflow-hidden hover:opacity-90 active:scale-[0.98]"
           >
             <UiIcon name="plus" className="size-4" />
             {!collapsed && <span>{label(cta.labelKey)}</span>}
@@ -424,10 +412,10 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
       )}
 
       {/* ── Account / Org switcher ──────────────────────────── */}
-      <div className="px-3 pb-4 pt-1">
+      <div className="shrink-0 px-3 pb-4 pt-1">
         <div className="mx-2 mb-3 h-px bg-border/60" />
         {!collapsed && (
-          <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+          <p className="mb-2 px-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             {t.dashboard.nav.sections.account}
           </p>
         )}
@@ -446,17 +434,17 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
               title={collapsed ? activeOrg?.name : undefined}
             >
               {/* Org avatar / initial */}
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-foreground/[0.08] text-sm font-semibold uppercase text-foreground">
-                {activeOrg?.name?.[0] ?? <UiIcon name="building" className="size-4" />}
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-xs font-semibold uppercase text-foreground">
+                {activeOrg?.name === "Ven Agency" ? <Logo compact size={18} /> : (activeOrg?.name?.[0] ?? <UiIcon name="building" className="size-4" />)}
               </div>
 
               {!collapsed && (
                 <>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14px] font-semibold leading-tight text-foreground">
+                    <p className="truncate text-sm font-semibold leading-5 text-foreground">
                       {activeOrg?.name ?? t.chrome.sidebar.workspaceFallback}
                     </p>
-                    <p className="truncate text-[12px] leading-tight text-muted-foreground">
+                    <p className="truncate text-xs leading-5 text-muted-foreground">
                       {orgs.length > 1
                         ? interpolate(t.chrome.sidebar.workspacesCount, {
                             count: String(orgs.length),
@@ -596,7 +584,7 @@ export function Sidebar({ mobileOpen = false, onCloseMobile }: { mobileOpen?: bo
                     <p className="truncate text-[14px] font-medium leading-tight text-foreground">
                       {displayName}
                     </p>
-                    <p className="truncate text-[12px] leading-tight text-muted-foreground">
+                    <p className="truncate text-xs leading-5 text-muted-foreground">
                       {displayEmail}
                     </p>
                     {cloudBadge?.email && (

@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "../styles/fonts.css";
 @import "../styles/theme.css";
@@ -213,7 +214,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Gellix', 'SF Arabic', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Geist', 'Inter', -apple-system, 'Segoe UI', 'SF Arabic', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', monospace;
   --text-xs: 0.8125rem;
   --text-xs--line-height: 1.25rem;
 }
@@ -279,42 +281,10 @@ button {
     animation: none;
   }
 }
-/* ── Card surfaces: lifted fills, never bordered boxes ─────────────────────
- * All three themes agree, so this is unscoped. A card separates from the page by
- * its own fill: white on light's grey page, a white overlay on dark's black and
- * dim's #141414. The hairline only ever made containers read as boxed-in, and on
- * dark it computed BRIGHTER than the fill it enclosed — an outline around a
- * hollow middle.
- *
- * This depends entirely on page-vs-card contrast (see --th-bg-page and
- * --th-card-bg). Move a page background toward its card fill and these cards go
- * invisible, because there is no border left to save them.
- *
- * Retired here rather than at the --th-card-bd token because most cards draw
- * their edge with the generic Tailwind `border-border/50` utility, not the token.
- * Unlayered on purpose: unlayered rules outrank Tailwind's `utilities` layer,
- * which is what lets this reach ~330 call sites across 175 files from one place.
- * Narrow by design — only the two NEUTRAL border utilities match, so colored and
- * stateful borders (border-primary when selected, border-destructive, hover tints
- * applied by swapping the class) are never touched.
- */
+/* Neutral card outlines keep dense settings and dashboard panels distinct. */
 .bg-card.border-border\/50,
 .bg-card.border-border\/60 {
-  border-color: transparent;
-}
-
-/* Exceptions: things that carry the card fill but are not card containers.
- * Matched by EXACT class names — never [class*="border-b"], which would also
- * match `border-border` and silently re-border every card. */
-input.bg-card,
-select.bg-card,
-textarea.bg-card,
-.bg-card.border-b,
-.bg-card.border-t,
-.bg-card.border-s,
-.bg-card.border-e,
-.bg-card.border-2 {
-  border-color: var(--th-bd-default);
+  border-color: var(--border);
 }
 
 /* A card nested inside a card, light only. Dim needs nothing here: its fill is a
@@ -339,4 +309,38 @@ html:not([data-theme="dark"]):not([data-theme="dim"])
 html[data-theme="dark"]
   .bg-card .bg-card:not(input):not(select):not(textarea) {
   background-color: var(--th-sf-03);
+}
+
+/* Ven workspace presentation; semantic status colours retain their meaning. */
+:root:not([data-theme]), [data-theme="light"] {
+  --th-bg-page: #fafafa;
+  --th-text-title: #09090b;
+  --th-text-body: #3f3f46;
+  --th-text-muted: #71717a;
+  --th-bd-default: #e4e4e7;
+  --th-bd-subtle: #e4e4e7;
+  --th-card-bd: #e4e4e7;
+  --th-btn-bg: #18181b;
+  --th-btn-bg-hover: #27272a;
+  --radius: 0.5rem;
+}
+.th-btn-accent {
+  background-image: none;
+  background-color: var(--th-btn-bg);
+  color: var(--th-btn-text);
+  box-shadow: none;
+}
+.th-btn-accent:hover { background-color: var(--th-btn-bg-hover); box-shadow: none; }
+.th-card { border-radius: 8px; }
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,13 +1,2 @@
-/**
- * Openship logo - a stylised "O" built with a bordered div.
- * Uses CSS border-foreground so it renders instantly (no JS theme check).
- */
-export function Logo({ size = 36, className }: { size?: number; className?: string }) {
-  return (
-    <div
-      className={`shrink-0 rounded-full border-[3px] border-foreground ${className ?? ""}`}
-      style={{ width: size, height: size }}
-      aria-hidden="true"
-    />
-  );
-}
+/** Ven fork branding seam. Keep the upstream Logo import and props stable. */
+export { VenLogo as Logo } from "./ven-logo";
