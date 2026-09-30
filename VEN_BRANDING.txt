@@ -1,0 +1,34 @@
+Ven fork branding — version 1
+
+The approved Ven Minimal Style v1.5 artwork is isolated in
+apps/dashboard/src/components/ven-logo.tsx. The existing components/logo.tsx
+import remains the integration seam, retaining size, className and compact
+props used by the login, sidebar, organisation avatar and unavailable shell.
+The SVG inherits currentColor for the existing light, dim and dark themes.
+No network logo, database migration, API or authentication change is required.
+
+Carry the Ven fork commits when merging or rebasing an upstream release.
+Do not replace the fork with an upstream checkout or use an unmodified official
+dashboard image: those images contain OpenShip branding.
+
+Before publishing each update, run:
+  bun run --cwd apps/dashboard test src/components/logo.render.test.tsx
+  bun run --cwd apps/dashboard lint
+  bun run --cwd apps/dashboard build
+
+Existing repository CI discovers logo.render.test.tsx in the dashboard suite.
+It renders the same public Logo import used by the application and fails if
+the accessible Ven mark, compact geometry, sizing or theme colour regresses.
+Keep this check when resolving upstream changes to the Logo import or props.
+If upstream changes the shell integration, review the new call sites and adapt
+the small wrapper rather than editing the approved artwork or unrelated code.
+
+Publish a dashboard image from the reviewed exact fork revision, pin its digest
+in the persistent Compose override, and preserve the API and other containers.
+Verify login/sidebar logos in the deployed light, dim and dark themes and the
+compact organisation mark, plus mobile navigation. Retain the previous pinned
+dashboard digest for dashboard-only rollback.
+
+This protects the normal merge/rebase-and-build upgrade path. Arbitrary future
+upstream changes still require review and passing CI; the guard is not a promise
+that every future upstream release will merge without conflicts.
